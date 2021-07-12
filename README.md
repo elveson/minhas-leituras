@@ -2,7 +2,7 @@
 
 ## Projeto
 
-Minhas Leitura é uma site para armazenar uma lista de livros que podem ser armazenados tanto para compra futura como para gerenciamento de leitura. No site é possível adicionar, remover e visitar página para a compra.
+Minhas Leituras é uma site para gerenciar uma lista de livros. Nele é possível adicionar novos livros, remover e gerencia-los tanto para compra futura como de leituras feitas.
 
 ## Tecnologias
 
