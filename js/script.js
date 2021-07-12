@@ -1,6 +1,8 @@
 /* 
 Descricao :
-	O que o arquivo faz ...
+	Gerencia uma lista de livros lidos via DOM. 
+  É possivel fazer a adição ou remoção de livros. 
+  Os livros já adicinados ficam salvos no localStorage.
 Aluno :
 	Elveson S. Costa
 Data :
@@ -13,45 +15,23 @@ function checkEmptyList() {
   }
 }
 
-const books = [
-  {
-    title: "As Cronicas de Narnia",
-    author: "C. S. Lewis",
-    url: "http://www.google.com",
-    isRead: true,
+const Storage = {
+  get() {
+    return JSON.parse(localStorage.getItem("my.reading:books")) || [];
   },
-  {
-    title: "1984",
-    author: "George Orwell",
-    url: "http://www.google.com",
-    isRead: false,
-  },
-  {
-    title:
-      "Nama Nenê: Como Cuida de seu bebê para que durma a noite toda de forma natural",
-    author: "Gary Ezzo",
-    url: "http://www.google.com",
-    isRead: true,
-  },
-];
 
-// const Storage = {
-//   get() {
-//     return JSON.parse(localStorage.getItem("my.reading:books")) || []
-//   },
-//   set(books) {
-//     localStorage.setItem("my.reading:books", JSON.stringify(books));
-//   },
-// },
+  set(book) {
+    localStorage.setItem("my.reading:books", JSON.stringify(book));
+  },
+};
 
 const Book = {
-  all: books,
-  bookContainer: document.querySelector("#container ul"),
+  all: Storage.get(),
 
   addBook(book) {
     Book.all.push(book);
+
     App.releoad();
-    console.log(Book.all);
   },
 
   removeBook(index) {
@@ -59,13 +39,20 @@ const Book = {
 
     App.releoad();
   },
+};
+
+document
+  .getElementsByTagName("form")[0]
+  .setAttribute("onsubmit", "Form.submit(event)");
+
+const DOM = {
+  bookContainer: document.querySelector("#container ul"),
 
   setBookLi(book, index) {
     const li = document.createElement("li");
-    li.innerHTML = Book.innerHTMLGetBook(book, index);
+    li.innerHTML = DOM.innerHTMLGetBook(book, index);
     li.dataset.index = index;
-    Book.bookContainer.appendChild(li);
-    // document.getElementsByTagName("li").className = "lido";
+    DOM.bookContainer.appendChild(li);
   },
 
   innerHTMLGetBook(book, index) {
@@ -90,15 +77,15 @@ const Book = {
   },
 
   clearBook() {
-    Book.bookContainer.innerHTML = "";
+    DOM.bookContainer.innerHTML = "";
   },
 };
 
 const Form = {
-  title: document.querySelector(".titulo"),
-  author: document.querySelector(".autor"),
-  link: document.querySelector(".link"),
-  isRead: document.querySelector(".lido"),
+  title: document.querySelector("input[name='titulo']"),
+  author: document.querySelector("input[name='autor']"),
+  link: document.querySelector("input[name='link']"),
+  isRead: document.querySelector("input[name='lido']"),
 
   getValues() {
     return {
@@ -109,7 +96,7 @@ const Form = {
     };
   },
 
-  validateForm() {
+  validateFields() {
     const { title, author, link } = Form.getValues();
 
     if (title.trim() === "" || author.trim() === "" || link.trim() === "") {
@@ -117,19 +104,21 @@ const Form = {
     }
   },
 
-  saveBook(book) {
-    Book.addBook(book);
+  clearFields() {
+    Form.title.value = "";
+    Form.author.value = "";
+    Form.link.value = "";
   },
 
   submit(event) {
     event.preventDefault();
 
     try {
-      Form.validateForm();
+      Form.validateFields();
 
-      Form.saveBook(Form.getValues());
-
-      // App.releoad();
+      const data = Form.getValues();
+      Book.addBook(data);
+      Form.clearFields();
     } catch (error) {
       alert(error.message);
     }
@@ -138,23 +127,15 @@ const Form = {
 
 const App = {
   init() {
-    Book.all.forEach((book, index) => {
-      Book.setBookLi(book, index);
-    });
-
     checkEmptyList();
+    Book.all.forEach(DOM.setBookLi);
+
+    Storage.set(Book.all);
   },
   releoad() {
-    Book.clearBook();
+    DOM.clearBook();
     App.init();
   },
 };
 
 App.init();
-
-// Book.addBook({
-//   title: "Uma gloria peculiar",
-//   author: "Jhon Piper",
-//   url: "http://",
-//   isRead: true,
-// });
